@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local state (not for repo)
+.cache/
+*.local.md
+
+# Logs
+*.log
+
+# Anything user-personalized (when used as a template, not source)
+AGENTS.local.md
