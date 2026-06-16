@@ -28,7 +28,7 @@ The result: a single skill that teaches your agent to **write first, learn conti
 | **Learning Loop** | After errors, corrections, feature requests | `.learnings/ERRORS.md`, `LEARNINGS.md`, `FEATURE_REQUESTS.md` |
 | **Working Buffer** | Context > 60% (via `session_status`) | `memory/working-buffer.md` |
 | **Heartbeat System** | Every ~30min (runtime-driven) | `HEARTBEAT.md` checklist (rotate 1-2 items) |
-| **Daily Digest** | Daily cron (13:30 BRT) | Telegram (main session) |
+| **Daily Digest** | Daily cron (13:30 BRT) | Telegram (main session) — formato compacto: `Daily DD/MM HH:MM BRT` + `Pendencias:`/`Sinais:`/`Sugestoes:` |
 | **Reverse Prompting** | Weekly cron (Sunday 18:00 BRT) | `notes/areas/proactive-tracker.md` + Telegram |
 | **Learning Review** | Weekly cron (Saturday 10:00 BRT) | `TOOLS.md`, `AGENTS.md`, `MEMORY.md` (gated) + Telegram |
 | **Pattern Detection** | Monthly cron (day 1, 10:00 BRT) | `notes/areas/proactive-tracker.md` + Telegram |
@@ -44,13 +44,32 @@ Live source: `openclaw cron action=list` / `~/.openclaw/workspace/.learnings/ERR
 
 | Cron | Owner | Schedule (BRT) | Cron expr | Stagger | What it does |
 |---|---|---|---|---|---|
-| **kaizen-daily-digest** | kaizen | Daily 13:30 | `30 13 * * *` | 120s | Read what was done (memory + learnings + tracker + outcome journal) of current + previous day → understand context → remind open items that need user action → suggest concrete next steps. |
+| **kaizen-daily-digest** | kaizen | Daily 13:30 | `30 13 * * *` | 120s | Read what was done (memory + learnings + tracker + outcome journal) of current + previous day → understand context → remind open items that need user action → suggest concrete next steps. Output: `Daily DD/MM HH:MM BRT` + `Pendencias:`/`Sinais:`/`Sugestoes:` (see `kaizen-digest-format`). |
 | **kaizen-reverse-prompting-weekly** | kaizen | Sunday 18:00 | `0 18 * * 0` | 60s | Read tracker + last 7d memory → 1-2 fresh reverse-prompting questions → post to Telegram. |
 | **kaizen-learning-review-weekly** | kaizen | Saturday 10:00 | `0 10 * * 6` | 90s | Promote `.learnings/` items with `Recurrence-Count >= 3` to `TOOLS.md` / `AGENTS.md`. |
 | **kaizen-pattern-automation-monthly** | kaizen | Day 1, 10:00 | `0 10 1 * *` | 120s | Detect patterns in last 30d memory (3+ repetitions) → propose automations. |
 | **Memory Dreaming Promotion** | memory-core | Every 6h | `0 */6 * * *` | 300s | Promote weighted short-term recalls to `MEMORY.md` (managed by `memory-core`, not kaizen). |
 
 > **Note:** All Kaizen crons use `sessionTarget: "isolated"` (autonomous `agentTurn`) with `delivery: announce → telegram:8157279145`. Memory-core dreaming is `delivery: none` (writes locally only). If you change a schedule here, also update the cron via `cron action=update` — this table is documentation, not config.
+
+### Digest Output Format (kaizen-digest-format)
+
+Compact Telegram-only format used by `kaizen-daily-digest`:
+
+```
+Daily DD/MM HH:MM BRT
+Pendencias:
+- descricao curta da pendencia - pergunta/decisao pendente
+- ...
+Sinais:
+- descricao curta do sinal observado
+- ...
+Sugestoes:
+- (acao|melhoria|automacao) descricao. Esforco: pequeno|medio|grande.
+- ...
+```
+
+Rules: no blank lines between sections, bullet `-` (not `•`), no markdown bold/italic (literal in Telegram), no `[N3.a]` prefix on items (use a single `(refs: ...)` footer line), max 3 items per section (extras omitted with `(+N secundarias omitidas)`), suppress empty sections, 1-2 lines per item.
 
 ### Search Rule (embedded in all Kaizen cron payloads)
 
