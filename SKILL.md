@@ -51,6 +51,7 @@ Live source: `openclaw cron action=list` / `~/.openclaw/workspace/.learnings/ERR
 | **kaizen-reverse-prompting-weekly** | kaizen | Sunday 18:00 | `0 18 * * 0` | 60s | Read tracker + last 7d memory → 1-2 fresh reverse-prompting questions → post to Telegram. |
 | **kaizen-learning-review-weekly** | kaizen | Saturday 10:00 | `0 10 * * 6` | 90s | Promote `.learnings/` items with `Recurrence-Count >= 3` to `TOOLS.md` / `AGENTS.md`. |
 | **kaizen-pattern-automation-monthly** | kaizen | Day 1, 10:00 | `0 10 1 * *` | 120s | Detect patterns in last 30d memory (3+ repetitions) → propose automations. |
+| **kaizen-docs-curator-weekly** | kaizen | Saturday 11:00 | `0 11 * * 6` | 90s | Detect descompasso entre `memory/` + `.learnings/` (source of truth) e `AGENTS.md`/`TOOLS.md`/`SKILL.md` (docs) → propor patch (NUNCA aplicar sozinho). |
 | **Memory Dreaming Promotion** | memory-core | Every 6h | `0 */6 * * *` | 300s | Promote weighted short-term recalls to `MEMORY.md` (managed by `memory-core`, not kaizen). |
 
 > **Note:** All Kaizen crons use `sessionTarget: "isolated"` (autonomous `agentTurn`) with `delivery: announce → telegram:8157279145`. Memory-core dreaming is `delivery: none` (writes locally only). If you change a schedule here, also update the cron via `cron action=update` — this table is documentation, not config.

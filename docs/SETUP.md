@@ -101,11 +101,42 @@ cron action=add <<EOF
 EOF
 ```
 
+## Cron 5: Docs Curator (weekly)
+
+**Schedule:** Saturday 11:00 BRT (cron: `0 11 * * 6`)
+**Purpose:** Detect descompasso entre `memory/` + `.learnings/` (source of truth) e `AGENTS.md`/`TOOLS.md`/`SKILL.md` (documentação principal). Propor patch (NUNCA aplicar sozinho).
+
+Detecta quando:
+- A) Comportamento recorrente no memory (3+ em 30d) que NAO está documentado.
+- B) Learning pendente com Recurrence-Count >= 3 que ainda nao foi promovido.
+- C) Decisao em outcome-journal.md que contradiz AGENTS.md/TOOLS.md.
+- D) Referencia quebrada em AGENTS.md/TOOLS.md/SKILL.md (link/path que nao existe mais).
+
+Output: post no Telegram com `Pendencias:` + `Patches propostos:` (max 3 patches, com diff sugerido + risco + reversibilidade). Se nada, fica em silencio.
+
+```bash
+cron action=add <<EOF
+{
+  "name": "kaizen-docs-curator-weekly",
+  "schedule": { "kind": "cron", "expr": "0 11 * * 6", "tz": "America/Sao_Paulo", "staggerMs": 90000 },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "message": "AUTONOMOUS docs curator semanal (Kaizen). NAO pergunte. Execute e reporte ao final.\n\n==== REGRA DE BUSCA ====\n[busca web antes de afirmar]\n\n==== PRE-CONCLUSION VERIFICATION GATE ====\n[3 tiers: mem -> doc -> web]\n\n==== MISSAO ====\nDetectar descompasso entre source of truth (memory/, .learnings/, proactive-tracker.md, outcome-journal.md) e documentacao (AGENTS.md, TOOLS.md, SKILL.md).\n\nCategorias A-D acima. Para cada descompasso, propor patch (arquivo, mudanca, diff, risco, reversibilidade).\n\nOutput Telegram: 'Curator DD/MM HH:MM BRT' + Pendencias + Patches propostos (max 3). Se nada, silencio.\n\nRestricoes: NUNCA aplique patch sozinho. Patches pequenos e faceis de reverter. NAO mexer em SOUL.md/IDENTITY.md.",
+    "fallbacks": ["google/gemini-3-flash-preview"],
+    "lightContext": false
+  },
+  "delivery": { "mode": "announce", "channel": "telegram", "to": "telegram:8157279145", "bestEffort": true }
+}
+EOF
+```
+
 ---
 
 ## Verification
 
 After adding crons:
+
 
 ```bash
 cron action=list
