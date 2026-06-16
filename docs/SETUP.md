@@ -33,6 +33,17 @@ cron action=add <<EOF
   "payload": {
     "kind": "agentTurn",
     "message": "AUTONOMOUS reverse-prompting semanal. NAO pergunte ao humano se pode rodar. Execute e reporte ao final.\n\n==== REGRA DE BUSCA (aplicar em todas as etapas) ====\nAntes de afirmar qualquer coisa sobre ferramenta externa, doc oficial, default de sistema, versao de pacote, "best practice" ou comportamento de API/lib, USE `web_search` / `web_fetch` (Tavily ou Firecrawl, configurados em `~/.openclaw/openclaw.json`).\n- Em duvida, busque. Custo de buscar: 3-5s. Custo de chutar e errar: retrabalho + perda de confianca.\n- Citar a fonte (URL) quando aplicavel.\n- Nao inventar. Nao "achar que sabe".\n- Knowledge cutoff: 2026-01. Tudo entre essa data e agora e candidato automatico a busca.\n\n1. Leia ~/.openclaw/workspace/notes/areas/proactive-tracker.md (se não existir, crie a partir de ~/.openclaw/workspace/skills/kaizen/templates/recurring-patterns.md adaptado).\n2. Leia ~/.openclaw/workspace/memory/ (últimos 7 dias) e ~/.openclaw/workspace/MEMORY.md.\n3. Identifique itens abertos no tracker ha >7d.\n4. Formule 1-2 perguntas FRESCAS (nao repita se <7d). Padroes: 'O que mais posso fazer por voce?' / 'Que informacao me ajudaria a ser mais util?'\n5. Atualize proactive-tracker.md → 'Reverse Prompting Questions Asked'.\n6. Poste no canal main (telegram) com delivery mode announce, em portugues, tom direto, sem emoji.\n\nRestrições: sem emoji, tom direto, sem floreio."
+
+==== PRE-CONCLUSION VERIFICATION GATE (3 tiers) ====
+Antes de CONCLUIR qualquer afirmacao nao-trivial, walk through 3 tiers em ordem:
+1. Tier 1 (mem): MEMORY.md, memory/YYYY-MM-DD.md, proactive-tracker.md, outcome-journal.md, .learnings/
+2. Tier 2 (doc): TOOLS.md, AGENTS.md, SKILL.md, USER.md, skills/*/lib/*.md
+3. Tier 3 (web): web_search (Tavily), web_fetch (Firecrawl)
+
+Use o tier MAIS BAIXO que da resposta confiante. Citar qual tier usou: [mem] / [doc] / [web] / [mem+web]. [guess] NAO E PERMITIDO.
+
+Ver lib/pre-conclusion-gate.md para detalhes.
+
   },
   "delivery": { "mode": "announce", "channel": "telegram", "to": "telegram:8157279145", "bestEffort": true }
 }
@@ -53,6 +64,17 @@ cron action=add <<EOF
   "payload": {
     "kind": "agentTurn",
     "message": "AUTONOMOUS growth-loops + proactive-surprise mensal.\n\n==== REGRA DE BUSCA (aplicar em todas as etapas) ====\nAntes de afirmar qualquer coisa sobre ferramenta externa, doc oficial, default de sistema, versao de pacote, "best practice" ou comportamento de API/lib, USE `web_search` / `web_fetch` (Tavily ou Firecrawl, configurados em `~/.openclaw/openclaw.json`).\n- Em duvida, busque. Custo de buscar: 3-5s. Custo de chutar e errar: retrabalho + perda de confianca.\n- Citar a fonte (URL) na proposta de automacao quando aplicavel.\n- Nao inventar. Nao "achar que sabe".\n- Knowledge cutoff: 2026-01. Tudo entre essa data e agora e candidato automatico a busca.\n\n1. Leia ~/.openclaw/workspace/memory/ (últimos 30 dias).\n2. Identifique padrões repetidos (3+): pedidos do humano, bugs, workflows manuais.\n3. Para cada padrão, formule proposta de automação.\n4. Se houver ≥1 padrão, poste no canal main (telegram) com delivery announce, em portugues, sem emoji:\n   - 'Padroes detectados este mes: ...'\n   - 'Propostas de automacao: ...'\n   - 'Posso rascunhar/implementar X? (Y/n)'\n5. Se não houver padrão ≥3x, NÃO poste nada (silêncio OK).\n6. Atualize ~/.openclaw/workspace/notes/areas/proactive-tracker.md → 'Surprises Delivered'.\n\nRestrições: sem emoji, tom direto, nao implemente nada sozinho."
+
+==== PRE-CONCLUSION VERIFICATION GATE (3 tiers) ====
+Antes de CONCLUIR qualquer afirmacao nao-trivial, walk through 3 tiers em ordem:
+1. Tier 1 (mem): MEMORY.md, memory/YYYY-MM-DD.md, proactive-tracker.md, outcome-journal.md, .learnings/
+2. Tier 2 (doc): TOOLS.md, AGENTS.md, SKILL.md, USER.md, skills/*/lib/*.md
+3. Tier 3 (web): web_search (Tavily), web_fetch (Firecrawl)
+
+Use o tier MAIS BAIXO que da resposta confiante. Citar qual tier usou: [mem] / [doc] / [web] / [mem+web]. [guess] NAO E PERMITIDO.
+
+Ver lib/pre-conclusion-gate.md para detalhes.
+
   },
   "delivery": { "mode": "announce", "channel": "telegram", "to": "telegram:8157279145", "bestEffort": true }
 }
@@ -73,6 +95,17 @@ cron action=add <<EOF
   "payload": {
     "kind": "agentTurn",
     "message": "AUTONOMOUS learning review semanal. NAO pergunte.\n\n==== REGRA DE BUSCA (aplicar em todas as etapas) ====\nAntes de afirmar qualquer coisa sobre ferramenta externa, doc oficial, default de sistema, versao de pacote, "best practice" ou comportamento de API/lib, USE `web_search` / `web_fetch` (Tavily ou Firecrawl, configurados em `~/.openclaw/openclaw.json`).\n- Em duvida, busque. Custo de buscar: 3-5s. Custo de chutar e errar: retrabalho + perda de confianca.\n- Citar a fonte (URL) na promocao quando aplicavel.\n- Nao inventar. Nao "achar que sabe".\n- Knowledge cutoff: 2026-01. Tudo entre essa data e agora e candidato automatico a busca.\n\n1. Leia ~/.openclaw/workspace/.learnings/ (todos os arquivos).\n2. Conte itens pendentes: grep -h 'Status\\\\*\\\\*: pending' .learnings/*.md | wc -l\n3. Para cada item com Recurrence-Count >= 3 (recurring pattern), promova:\n   - Tech learning → ~/.openclaw/workspace/TOOLS.md\n   - Workflow improvement → ~/.openclaw/workspace/AGENTS.md\n4. Para cada item com Status=resolved, mantenha (não delete).\n5. Para itens com See Also, adicione links cruzados se faltar.\n6. Se houver ≥1 promoção, poste resumo no canal main (telegram) com delivery announce, em portugues, sem emoji.\n7. Se nada para promover, fique em silencio.\n\nRestrições: nunca promova para SOUL.md/IDENTITY.md/MEMORY.md (esses têm gate)."
+
+==== PRE-CONCLUSION VERIFICATION GATE (3 tiers) ====
+Antes de CONCLUIR qualquer afirmacao nao-trivial, walk through 3 tiers em ordem:
+1. Tier 1 (mem): MEMORY.md, memory/YYYY-MM-DD.md, proactive-tracker.md, outcome-journal.md, .learnings/
+2. Tier 2 (doc): TOOLS.md, AGENTS.md, SKILL.md, USER.md, skills/*/lib/*.md
+3. Tier 3 (web): web_search (Tavily), web_fetch (Firecrawl)
+
+Use o tier MAIS BAIXO que da resposta confiante. Citar qual tier usou: [mem] / [doc] / [web] / [mem+web]. [guess] NAO E PERMITIDO.
+
+Ver lib/pre-conclusion-gate.md para detalhes.
+
   },
   "delivery": { "mode": "announce", "channel": "telegram", "to": "telegram:8157279145", "bestEffort": true }
 }
