@@ -2,9 +2,9 @@
 name: kaizen
 version: 1.0.0
 description: "Continuous improvement skill for OpenClaw agents. Combines self-improving pattern capture (pskoett) with proactive memory/context survival (halthelobster). Survives compaction, learns from every interaction, surfaces what you didn't ask for."
-author: igooor7
+author: igorgaffuri
 license: MIT
-source: https://github.com/igooor7/kaizen
+source: https://github.com/igorgaffuri/kaizen
 ---
 
 # Kaizen — Continuous Agent Improvement

@@ -32,7 +32,7 @@ The result: a single, OpenClaw-native loop that teaches your agent to **write fi
 
 ```bash
 # Clone
-git clone https://github.com/igooor7/kaizen.git ~/.openclaw/workspace/skills/kaizen
+git clone https://github.com/igorgaffuri/kaizen.git ~/.openclaw/workspace/skills/kaizen
 
 # Add trigger to AGENTS.md (copy from lib/triggers.md)
 # Optionally add crons (see docs/SETUP.md)
