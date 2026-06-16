@@ -29,6 +29,34 @@
 
 ---
 
+## Auto-Read at Turn Start (READ FIRST)
+
+The WAL as written only writes on user input. To survive session restarts and compaction, the agent MUST also **read `SESSION-STATE.md` at the start of every turn** when it exists and meets one of these conditions:
+
+- **Age > 24h** since the last `mtime` (likely a new session)
+- **Size > 5KB** (significant state to recover)
+- **User just resumed after a silence** (heuristic: no message in 30+ min)
+
+```bash
+# Quick check at turn start
+test -f ~/.openclaw/workspace/SESSION-STATE.md && \
+  { find ~/.openclaw/workspace/SESSION-STATE.md -mtime +0 | grep -q . || \
+    [ $(stat -c%s ~/.openclaw/workspace/SESSION-STATE.md) -gt 5120 ]; } && \
+  cat ~/.openclaw/workspace/SESSION-STATE.md
+```
+
+If the file is non-trivial, spend 5-10 seconds skimming it BEFORE responding. This is what makes continuity feel real to the user — they don't have to re-explain "remember, I prefer conservative git commits" every session.
+
+**Why this is part of WAL, not a separate loop:** WAL's whole thesis is that context is a buffer. Reading the previous session's buffer is the obvious symmetric operation to writing the current one.
+
+**When to skip the auto-read:**
+
+- File is < 5KB AND was modified in the last 24h (current session, no need)
+- User is in a new topic with no continuity (heuristic: message starts with new file/URL not mentioned in SESSION-STATE.md)
+- After a session that's clearly stale (compaction happened, agent is essentially rebooted — recover from `working-buffer.md` instead)
+
+---
+
 ## Where to Write What
 
 | Type | Destination | Why |
