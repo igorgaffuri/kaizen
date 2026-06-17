@@ -79,6 +79,42 @@ Apply the gate before:
 
 ---
 
+## Concrete trigger patterns (from real sessions)
+
+These are cases that actually happened and got flagged. Apply mechanically.
+
+### Listing 3+ external tools, frameworks, or libraries
+
+**Trigger:** user asks "what's the X for Y?" (e.g. "what's the vitest for testing AI agent skills?", "what eval frameworks exist?") and you respond with a list of 3+ tools.
+
+**Required:** `web_search` FIRST, then write the list with [web] citation per tool. **Even if you remember the names** — status (acquired, deprecated, EOL, pivot) and current focus change after 2026-01.
+
+**Why:** example: 2026-06-16 session — user asked about eval frameworks, I listed 9 tools from memory including Promptfoo as "for prompt testing." Promptfoo was acquired by OpenAI in 2026 and now focuses on AI security / red-teaming. I missed DeepEval v4.0.3, Braintrust, Arize Phoenix, Comet Opik entirely. User caught it: "Encontrou isso buscando na web?"
+
+**Lesson:** the cost of remembering "shape" of an ecosystem is that you miss the 2026-specific deltas. Cost of searching: 3-5s.
+
+### Citing project status (acquired, deprecated, abandoned, EOL)
+
+**Trigger:** saying "X is OSS" / "X is maintained" / "X is the default" about any external project.
+
+**Required:** `web_search` to confirm current status. The "shape" of a project can change without you noticing (acquisition, pivot, sunsetting).
+
+**Why:** example: same session as above. Promptfoo homepage now opens with "Promptfoo is now part of OpenAI" — that's a material change.
+
+### Recommending a numeric default or limit
+
+**Trigger:** "use 1000 tokens" / "set timeout to 30s" / "keep 50MB" / "max 3 retries" — any specific number that isn't in the local docs.
+
+**Required:** `web_search` to confirm the current best practice, OR cite a local source (`[doc]` with file:line).
+
+### Mentioning a "current best practice"
+
+**Trigger:** saying "the recommended way to X is Y" or "you should use Z pattern" about anything in the wider tech ecosystem.
+
+**Required:** `web_search` for "Z best practice 2026" before stating it as recommended. Best practices churn.
+
+---
+
 ## Cost of searching vs cost of being wrong
 
 | Action | Cost |
