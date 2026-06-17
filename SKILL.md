@@ -1,11 +1,17 @@
 ---
 name: kaizen
-version: 1.0.0
+version: 1.2.0
 description: "Continuous improvement skill for OpenClaw agents. Combines self-improving pattern capture (pskoett) with proactive memory/context survival (halthelobster). Survives compaction, learns from every interaction, surfaces what you didn't ask for."
 author: igorgaffuri
 license: MIT
 source: https://github.com/igorgaffuri/kaizen
 ---
+
+# Changelog
+
+- **1.2.0** (2026-06-17) — Progress Narration pattern (`lib/progress-narration.md`): user-visible progress during multi-step ops; 6 trigger conditions; format `[step N/M: <desc>] <status>` + `[next: <preview>]`.
+- **1.1.0** (2026-06-17) — Self-Correction Loop (`lib/self-correction-loop.md`): circuit breaker 3x for non-trivial outputs failing Binary Assertions; `retry_count` persisted in `memory/working-buffer.md`.
+- **1.0.0** (initial) — WAL Protocol, Working Buffer, Heartbeat, Reflexion Loop, Pre-Conclusion Gate, Binary Assertions, Learning Loop, Reverse Prompting, Proactive Surprise, Compaction Recovery, docs curator.
 
 # Kaizen — Continuous Agent Improvement
 
