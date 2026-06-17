@@ -44,3 +44,23 @@ Once context hits 60%, EVERY exchange gets logged. No exceptions. No "this one's
 ---
 
 ## Active log (entries go below this line)
+
+
+---
+
+## Self-Correction State
+
+Used by the [Self-Correction Loop](../lib/self-correction-loop.md). Persisted
+here so it survives compaction.
+
+```yaml
+retry_count: 0
+last_failure_iso: null
+last_failed_assertions: []
+last_task_verbatim: ""
+```
+
+Reset to `retry_count: 0` when:
+- Binary Assertions passes
+- New day (cron `kaizen-daily-digest` 13:30 BRT)
+- User sends an unrelated message
