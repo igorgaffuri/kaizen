@@ -166,6 +166,37 @@ EOF
 
 ---
 
+## Cron 6: Health Check (daily)
+
+**Schedule:** Daily 09:00 BRT (cron: `0 9 * * *`)
+**Purpose:** Roda `scripts/smoke-test.sh` automaticamente e posta resultado no Telegram. Health check diário da skill.
+
+Detecta:
+- Drift entre SETUP.md e SQLite (cron payload mudou mas doc não acompanhou)
+- Cron disable silencioso
+- Arquivo deletado
+- Working tree sujo
+- Cron unpushed
+
+Output: post no Telegram com `Health DD/MM HH:MM BRT` + `Status: OK (73/73)` ou `Status: FAIL` + lista das primeiras 3 falhas. Se tudo OK, post conciso. Se nada, silêncio.
+
+```bash
+# Payload (resumido):
+{
+  "name": "kaizen-health-daily",
+  "schedule": { "kind": "cron", "expr": "0 9 * * *", "tz": "America/Sao_Paulo", "staggerMs": 60000 },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "message": "AUTONOMOUS health check diario (Kaizen). NAO pergunte. Execute e reporte.\n\n==== ETAPA 1: RODAR SMOKE ====\n  bash /home/igor/.openclaw/workspace/skills/kaizen/scripts/smoke-test.sh\nCapture stdout + exit code.\n\n==== ETAPA 2: INTERPRETAR ====\n- exit 0 = Health OK\n- exit 1 = listar falhas (linhas com [FAIL])\n\n==== ETAPA 3: POSTAR ====\nFormato compacto: 'Health DD/MM HH:MM BRT' + 'Status: OK (73/73)' OU 'Status: FAIL' + ate 3 falhas.",
+    "lightContext": false
+  },
+  "delivery": { "mode": "announce", "channel": "telegram", "to": "telegram:8157279145", "bestEffort": true }
+}
+```
+
+---
+
 ## Verification
 
 After adding crons:
