@@ -27,6 +27,7 @@ The result: a single skill that teaches your agent to **write first, learn conti
 | **WAL Protocol** | Before every response: correction, decision, value, URL, name | `SESSION-STATE.md` |
 | **Reflexion Loop** | After non-trivial task (code change, multi-step workflow, decision with trade-offs, failure recovered) | `notes/areas/reflexion-log.md` (agent SELF-eval; see `lib/reflexion-loop.md`) |
 | **Self-Correction Loop** | After Binary Assertions fails on a non-trivial output (max 3 retries; circuit breaker) | `memory/working-buffer.md` → `## Self-Correction State` (see `lib/self-correction-loop.md`) |
+| **Progress Narration** | During multi-step operations (3+ tool calls, op > 30s, error/abort, > 60s silent) | Inline to user (1-2 line ticks, see `lib/progress-narration.md`) |
 | **Pre-Conclusion Gate** | Before any non-trivial assertion (default, version, "best practice", external tool behavior) | Cite tier used: `[mem]` / `[doc]` / `[web]` (see `lib/pre-conclusion-gate.md`) |
 | **Binary Assertions** | After every non-trivial output (code, config, command, recommendation) | Pass/fail checklist; any `no` = task incomplete (see `lib/binary-assertions.md`) |
 | **Learning Loop** | After errors, corrections, feature requests | `.learnings/ERRORS.md`, `LEARNINGS.md`, `FEATURE_REQUESTS.md` |

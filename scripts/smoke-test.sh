@@ -48,6 +48,7 @@ hdr "1. Structural"
 for f in SKILL.md README.md LICENSE lib/pre-conclusion-gate.md lib/binary-assertions.md \
          lib/wal-protocol.md lib/heartbeat.md lib/learning-loop.md lib/reverse-prompting.md \
          lib/tool-migration.md lib/triggers.md lib/working-buffer.md lib/reflexion-loop.md \
+         lib/self-correction-loop.md lib/progress-narration.md \
          docs/ARCHITECTURE.md docs/MIGRATION.md docs/SETUP.md \
          templates/session-state.md templates/working-buffer.md templates/reflexion-log.md \
          templates/recurring-patterns.md templates/outcome-journal.md \
