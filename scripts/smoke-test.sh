@@ -22,6 +22,7 @@ fi
 
 ok()   { PASS=$((PASS+1)); printf "  ${GREEN}[ok]${NC} %s\n" "$*"; }
 fail() { FAIL=$((FAIL+1)); FAILS+=("$*"); printf "  ${RED}[FAIL]${NC} %s\n" "$*"; }
+info() { printf "  ${CYAN}[info]${NC} %s\n" "$*"; }
 hdr()  { printf "\n${CYAN}== %s ==${NC}\n" "$*"; }
 
 # Read sqlite cell via temp python script (avoids quote-escaping issues in -c)
@@ -116,29 +117,39 @@ if [ ! -f "$SQLITE" ]; then
 else
   ok "SQLite present"
 
-  KAIZEN_JOBS=(
-    "97df7b97-2c93-40dd-8867-37be790b9b13"
-    "7a187e58-b440-4e87-9cda-8818089409d5"
-    "bb36b084-a5c0-4b5d-9a5d-e0b3395f3b10"
-    "5c51e756-d371-421b-8f96-12341b924cce"
-    "a294b5c5-146b-43b9-b7f5-7a4f363b9610"
+  # Look up jobs by name (stable across reinstalls), not by hardcoded UUID.
+  # UUIDs drift when crons are recreated via `openclaw cron action=add`; names don't.
+  KAIZEN_JOB_NAMES=(
+    "kaizen-daily-digest"
+    "kaizen-learning-review-weekly"
+    "kaizen-docs-curator-weekly"
+    "kaizen-reverse-prompting-weekly"
+    "kaizen-pattern-automation-monthly"
+    "kaizen-health-daily"
   )
 
-  for job_id in "${KAIZEN_JOBS[@]}"; do
-    name=$(sqlite_get "SELECT name FROM cron_jobs WHERE job_id = '$job_id'")
-    if [ -n "$name" ]; then ok "cron present: $name"
-    else fail "cron missing: $job_id"; fi
+  declare -A JOB_IDS
+  for name in "${KAIZEN_JOB_NAMES[@]}"; do
+    job_id=$(sqlite_get "SELECT job_id FROM cron_jobs WHERE name = '$name'")
+    if [ -n "$job_id" ]; then
+      JOB_IDS["$name"]="$job_id"
+      ok "cron present: $name"
+    else
+      fail "cron missing: $name"
+    fi
   done
 
-  for job_id in "${KAIZEN_JOBS[@]}"; do
-    name=$(sqlite_get "SELECT name FROM cron_jobs WHERE job_id = '$job_id'")
+  for name in "${KAIZEN_JOB_NAMES[@]}"; do
+    job_id="${JOB_IDS[$name]:-}"
+    [ -z "$job_id" ] && continue
     has_gate=$(sqlite_get "SELECT CASE WHEN job_json LIKE '%PRE-CONCLUSION%' THEN 1 ELSE 0 END FROM cron_jobs WHERE job_id = '$job_id'")
     if [ "$has_gate" = "1" ]; then ok "GATE present in: $name"
     else fail "GATE MISSING in: $name"; fi
   done
 
-  for job_id in "${KAIZEN_JOBS[@]}"; do
-    name=$(sqlite_get "SELECT name FROM cron_jobs WHERE job_id = '$job_id'")
+  for name in "${KAIZEN_JOB_NAMES[@]}"; do
+    job_id="${JOB_IDS[$name]:-}"
+    [ -z "$job_id" ] && continue
     enabled=$(sqlite_get "SELECT enabled FROM cron_jobs WHERE job_id = '$job_id'")
     tz=$(sqlite_get "SELECT schedule_tz FROM cron_jobs WHERE job_id = '$job_id'")
     expr=$(sqlite_get "SELECT schedule_expr FROM cron_jobs WHERE job_id = '$job_id'")
@@ -149,8 +160,9 @@ else
     fi
   done
 
-  for job_id in "${KAIZEN_JOBS[@]}"; do
-    name=$(sqlite_get "SELECT name FROM cron_jobs WHERE job_id = '$job_id'")
+  for name in "${KAIZEN_JOB_NAMES[@]}"; do
+    job_id="${JOB_IDS[$name]:-}"
+    [ -z "$job_id" ] && continue
     target=$(sqlite_get "SELECT delivery_to FROM cron_jobs WHERE job_id = '$job_id'")
     if [ "$target" = "telegram:8157279145" ]; then ok "$name: delivery=$target"
     else fail "$name: delivery=$target"; fi
@@ -175,7 +187,14 @@ remote=$(git remote get-url origin 2>/dev/null)
 [ -n "$remote" ] && ok "origin: $remote" || fail "no origin remote"
 
 unpushed=$(git log --oneline "origin/${branch}..${branch}" 2>/dev/null | wc -l)
-[ "$unpushed" -eq 0 ] && ok "no unpushed commits" || fail "$unpushed unpushed commits"
+if [ "$unpushed" -eq 0 ]; then
+  ok "no unpushed commits"
+elif [ "$remote" = "https://github.com/igorgaffuri/kaizen.git" ]; then
+  # Upstream-only clone (not fork): push denied with 403. Not the user's fault.
+  info "$unpushed unpushed commits (upstream-only clone, push blocked — expected)"
+else
+  fail "$unpushed unpushed commits"
+fi
 
 # -------------------- SUMMARY --------------------
 echo ""
